@@ -80,7 +80,6 @@ gnuplot-x11
 qalculate-gtk
 python3-sympy
 python3-pandas
-python3-control
 python3-serial
 # Embedded
 gcc-avr

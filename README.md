@@ -35,3 +35,8 @@ Docker and WebSockets (a VPS, Fly.io, Cloud Run) behind HTTPS, with a real passw
 3. `fly secrets set VNC_PASSWORD=<strong-password> -a bishnt-vibeos`
 4. `fly deploy --remote-only` (or add a `FLY_API_TOKEN` repo secret and run the **deploy-fly** workflow).
 The machine stops when idle and wakes on the first visit, so the first load takes a few seconds.
+
+## Troubleshooting the hosted desktop
+- Set the password: `fly secrets set VNC_PASSWORD=yourpass -a bishnt-vibeos`
+- Redeploy after changes: `git pull && fly deploy --remote-only`
+- Logs: `fly logs -a bishnt-vibeos` (lines starting with `[vibeos]` show startup progress)

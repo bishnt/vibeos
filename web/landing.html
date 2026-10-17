@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VibeOS</title>
+<style>
+  :root { --bg:#0e1116; --fg:#e8eaed; --muted:#9aa4b2; --accent:#4ade80; --card:#161b22; --line:#262d38; }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f6f8fa; --fg:#14181f; --muted:#5b6573; --accent:#15803d; --card:#fff; --line:#d8dee4; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background:var(--bg); color:var(--fg); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:560px; padding:32px 24px; text-align:center; }
+  h1 { font-size:2.6rem; margin:0 0 8px; letter-spacing:-0.02em; }
+  h1 span { color:var(--accent); }
+  p.lead { color:var(--muted); font-size:1.1rem; line-height:1.5; margin:0 0 28px; }
+  a.btn { display:inline-block; background:var(--accent); color:#04130a; font-weight:600; text-decoration:none;
+          padding:14px 28px; border-radius:10px; font-size:1.05rem; }
+  a.btn:hover { filter:brightness(1.08); }
+  ul { list-style:none; padding:0; margin:36px 0 0; display:grid; gap:10px; text-align:left; }
+  li { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 16px; color:var(--muted); font-size:.95rem; }
+  li b { color:var(--fg); }
+  small { display:block; margin-top:28px; color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Vibe<span>OS</span></h1>
+  <p class="lead">A Debian-based Linux desktop for engineering students, running in your browser.</p>
+  <a class="btn" href="vnc.html?autoconnect=true&amp;resize=scale&amp;reconnect=true">Launch desktop</a>
+  <ul>
+    <li><b>Tools:</b> KiCad, Python with NumPy, SciPy and Matplotlib, Git, Firefox</li>
+    <li><b>Access:</b> you will be asked for the password</li>
+    <li><b>Shared session:</b> everyone connected sees the same screen</li>
+  </ul>
+  <small>The first load can take up to 30 seconds while the machine wakes up.</small>
+</main>
+</body>
+</html>

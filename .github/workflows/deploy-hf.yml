@@ -22,24 +22,24 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Smoke test
         run: |
-          if ! out=$(docker run -d --name t -e VNC_PASSWORD=testpass1 -p 6080:6080 vibeos-hf 2>&1); then
+          if ! out=$(docker run -d --name vibeos-test -e VNC_PASSWORD=testpass1 -p 6080:6080 vibeos-hf 2>&1); then
             echo "::error title=docker run failed::$(echo "$out" | tr '\n' ' ' | cut -c1-2000)"
             docker images | head -5
             exit 1
           fi
           sleep 30
-          docker logs t 2>&1 | tail -20
+          docker logs vibeos-test 2>&1 | tail -20
           curl -sf localhost:6080/ | grep -q "Launch desktop"
           curl -sf localhost:6080/vnc.html | grep -q "<title>VibeOS</title>"
-          docker exec t pgrep -x Xtigervnc
-          docker exec t pgrep -x xfce4-panel
-          docker exec t pgrep -x xfdesktop
+          docker exec vibeos-test pgrep -x Xtigervnc
+          docker exec vibeos-test pgrep -x xfce4-panel
+          docker exec vibeos-test pgrep -x xfdesktop
           echo "::notice title=Smoke test::landing page, noVNC, X server, panel and desktop are all running"
       - name: Report failure details
         if: failure()
         run: |
-          echo "::error title=Container log::$(docker logs t 2>&1 | tail -30 | tr '\n' ' ' | cut -c1-2500)"
-          echo "::error title=Processes::$(docker exec t ps -eo comm 2>&1 | tr '\n' ' ' | cut -c1-1500)"
+          echo "::error title=Container log::$(docker logs vibeos-test 2>&1 | tail -30 | tr '\n' ' ' | cut -c1-2500)"
+          echo "::error title=Processes::$(docker exec vibeos-test ps -eo comm 2>&1 | tr '\n' ' ' | cut -c1-1500)"
 
   deploy:
     needs: test

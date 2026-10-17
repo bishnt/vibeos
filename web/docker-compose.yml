@@ -1,0 +1,10 @@
+services:
+  vibeos-web:
+    build:
+      context: ..
+      dockerfile: web/Dockerfile
+    ports:
+      - "6080:6080"
+    shm_size: 1gb   # Firefox and KiCad crash without enough shared memory
+    environment:
+      - VNC_PASSWORD=${VNC_PASSWORD:?set VNC_PASSWORD}

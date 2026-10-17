@@ -2,6 +2,7 @@ name: build-iso
 on:
   push:
     branches: [main, master]
+    paths: ['auto/**', 'config/**']
   workflow_dispatch:
 
 jobs:

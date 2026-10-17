@@ -10,13 +10,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
       - name: Build image
-        run: |
-          set -o pipefail
-          docker build -f hf/Dockerfile -t vibeos-hf --progress=plain . 2>&1 | tee build.log
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: hf/Dockerfile
+          load: true
+          tags: vibeos-hf
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Smoke test
         run: |
-          docker run -d --name t -e VNC_PASSWORD=testpass1 -p 6080:6080 vibeos-hf
+          if ! out=$(docker run -d --name t -e VNC_PASSWORD=testpass1 -p 6080:6080 vibeos-hf 2>&1); then
+            echo "::error title=docker run failed::$(echo "$out" | tr '\n' ' ' | cut -c1-2000)"
+            docker images | head -5
+            exit 1
+          fi
           sleep 30
           docker logs t 2>&1 | tail -20
           curl -sf localhost:6080/ | grep -q "Launch desktop"
@@ -28,7 +38,6 @@ jobs:
       - name: Report failure details
         if: failure()
         run: |
-          echo "::error title=Build log::$(grep -E 'E: |Unable to locate|ERROR|No space' build.log | tail -10 | tr '\n' ' ' | cut -c1-2500)"
           echo "::error title=Container log::$(docker logs t 2>&1 | tail -30 | tr '\n' ' ' | cut -c1-2500)"
           echo "::error title=Processes::$(docker exec t ps -eo comm 2>&1 | tr '\n' ' ' | cut -c1-1500)"
 

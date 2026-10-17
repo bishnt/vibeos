@@ -6,7 +6,7 @@ COPY config/package-lists/vibeos.list.chroot /tmp/vibeos.list
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      tigervnc-standalone-server tigervnc-common novnc websockify \
+      tigervnc-standalone-server tigervnc-common tigervnc-tools novnc websockify \
       x11-xkb-utils xkb-data fonts-dejavu-core \
       dbus-x11 ca-certificates procps \
  && grep -vE '^\s*(#|$)' /tmp/vibeos.list \

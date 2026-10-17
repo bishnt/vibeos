@@ -13,8 +13,8 @@ log "memory: $(free -m | awk '/Mem/{print $2}') MB"
 
 start_desktop() {
   set -e
-  VNCPASSWD=$(command -v vncpasswd || command -v tigervncpasswd)
-  XVNC=$(command -v Xtigervnc || command -v Xvnc)
+  VNCPASSWD=$(command -v vncpasswd || command -v tigervncpasswd) || { log "ERROR: vncpasswd not found"; exit 1; }
+  XVNC=$(command -v Xtigervnc || command -v Xvnc) || { log "ERROR: Xtigervnc not found"; exit 1; }
   log "vncpasswd=$VNCPASSWD xvnc=$XVNC"
 
   mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix

@@ -28,3 +28,10 @@ VNC_PASSWORD=choose-one docker compose up --build
 ```
 CI publishes the image to `ghcr.io/bishnt/vibeos-web`. To put it online, run that image on any host that supports
 Docker and WebSockets (a VPS, Fly.io, Cloud Run) behind HTTPS, with a real password. GitHub Pages can't host it.
+
+## Host it on Fly.io
+1. Install flyctl and run `fly auth login`.
+2. `fly apps create bishnt-vibeos` (or change `app` in `fly.toml`).
+3. `fly secrets set VNC_PASSWORD=<strong-password> -a bishnt-vibeos`
+4. `fly deploy --remote-only` (or add a `FLY_API_TOKEN` repo secret and run the **deploy-fly** workflow).
+The machine stops when idle and wakes on the first visit, so the first load takes a few seconds.

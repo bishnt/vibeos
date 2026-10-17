@@ -1,7 +1,7 @@
 name: build-web
 on:
   push:
-    paths: ['web/**', 'config/package-lists/**', '.github/workflows/build-web.yml']
+    paths: ['web/**', 'config/**', '.github/workflows/build-web.yml']
   workflow_dispatch:
 
 permissions:
@@ -11,17 +11,23 @@ permissions:
 jobs:
   image:
     runs-on: ubuntu-latest
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}-web:latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: web/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository }}-web:latest
+      - name: Build image
+        run: |
+          set -o pipefail
+          docker build -f web/Dockerfile -t "$IMAGE" --progress=plain . 2>&1 | tee build.log
+      - name: Report build errors
+        if: failure()
+        run: |
+          echo "::error title=Matching lines::$(grep -E 'E: |Unable to locate|no installation candidate|ERROR|not found|No space' build.log | tail -15 | tr '\n' ' ' | cut -c1-3000)"
+          echo "::error title=Log tail::$(tail -25 build.log | tr '\n' ' ' | cut -c1-3000)"
+      - name: Push image
+        run: docker push "$IMAGE"

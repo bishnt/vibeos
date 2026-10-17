@@ -40,3 +40,9 @@ The machine stops when idle and wakes on the first visit, so the first load take
 - Set the password: `fly secrets set VNC_PASSWORD=yourpass -a bishnt-vibeos`
 - Redeploy after changes: `git pull && fly deploy --remote-only`
 - Logs: `fly logs -a bishnt-vibeos` (lines starting with `[vibeos]` show startup progress)
+
+## Host it on Hugging Face Spaces (free, no card)
+1. Create a free account at huggingface.co and make a **write** token under Settings, Access Tokens.
+2. In this GitHub repo, add secrets `HF_TOKEN` (that token) and `VNC_PASSWORD` (8 characters).
+3. Run the **deploy-hf** workflow. It tests the image, creates the Space `vibeos` and pushes to it.
+4. Open `https://<your-hf-username>-vibeos.hf.space`.

@@ -1,0 +1,76 @@
+name: deploy-hf
+on:
+  push:
+    branches: [main, master]
+    paths: ['web/**', 'hf/**', 'config/**', '.github/workflows/deploy-hf.yml']
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: |
+          set -o pipefail
+          docker build -f hf/Dockerfile -t vibeos-hf --progress=plain . 2>&1 | tee build.log
+      - name: Smoke test
+        run: |
+          docker run -d --name t -e VNC_PASSWORD=testpass1 -p 6080:6080 vibeos-hf
+          sleep 30
+          docker logs t 2>&1 | tail -20
+          curl -sf localhost:6080/ | grep -q "Launch desktop"
+          curl -sf localhost:6080/vnc.html | grep -q "<title>VibeOS</title>"
+          docker exec t pgrep -x Xtigervnc
+          docker exec t pgrep -x xfce4-panel
+          docker exec t pgrep -x xfdesktop
+          echo "::notice title=Smoke test::landing page, noVNC, X server, panel and desktop are all running"
+      - name: Report failure details
+        if: failure()
+        run: |
+          echo "::error title=Build log::$(grep -E 'E: |Unable to locate|ERROR|No space' build.log | tail -10 | tr '\n' ' ' | cut -c1-2500)"
+          echo "::error title=Container log::$(docker logs t 2>&1 | tail -30 | tr '\n' ' ' | cut -c1-2500)"
+          echo "::error title=Processes::$(docker exec t ps -eo comm 2>&1 | tr '\n' ' ' | cut -c1-1500)"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for token
+        run: |
+          if [ -z "$HF_TOKEN" ]; then
+            echo "::warning title=Not deployed::Add a repository secret named HF_TOKEN (a Hugging Face write token), then re-run this workflow."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+      - name: Create the Space and set the password
+        if: env.SKIP != '1'
+        run: |
+          user=$(curl -sf -H "Authorization: Bearer $HF_TOKEN" https://huggingface.co/api/whoami-v2 | jq -r .name)
+          echo "HF_USER=$user" >> "$GITHUB_ENV"
+          curl -s -o /dev/null -w "create space: %{http_code}\n" -X POST https://huggingface.co/api/repos/create \
+            -H "Authorization: Bearer $HF_TOKEN" -H "Content-Type: application/json" \
+            -d '{"type":"space","name":"vibeos","sdk":"docker","private":false}'
+          if [ -n "$VNC_PASSWORD" ]; then
+            curl -s -o /dev/null -w "set password: %{http_code}\n" -X POST "https://huggingface.co/api/spaces/$user/vibeos/secrets" \
+              -H "Authorization: Bearer $HF_TOKEN" -H "Content-Type: application/json" \
+              -d "$(jq -n --arg v "$VNC_PASSWORD" '{key:"VNC_PASSWORD",value:$v}')"
+          else
+            echo "::warning title=No password::Add a repository secret named VNC_PASSWORD, or set it in the Space settings."
+          fi
+      - name: Push to the Space
+        if: env.SKIP != '1'
+        run: |
+          rm -rf /tmp/space && mkdir /tmp/space
+          rsync -a --exclude .git --exclude .github ./ /tmp/space/
+          cp hf/Dockerfile /tmp/space/Dockerfile
+          cp hf/README.md /tmp/space/README.md
+          cd /tmp/space
+          git init -q -b main
+          git config user.name "vibeos-ci" && git config user.email "ci@users.noreply.github.com"
+          git add -A && git commit -qm "Sync from GitHub"
+          git push -f "https://$HF_USER:$HF_TOKEN@huggingface.co/spaces/$HF_USER/vibeos" main
+          echo "::notice title=Deployed::https://huggingface.co/spaces/$HF_USER/vibeos"

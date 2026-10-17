@@ -40,3 +40,6 @@ texlive-science
 latexmk
 inkscape
 openscad
+clang
+valgrind
+kicad-packages3d

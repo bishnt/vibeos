@@ -66,8 +66,6 @@ sqlite3
 cmake
 ninja-build
 gdb
-valgrind
-clang
 python3-dev
 pipx
 nodejs

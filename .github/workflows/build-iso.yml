@@ -1,0 +1,30 @@
+name: build-iso
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+      options: --privileged
+    steps:
+      - name: Install build deps
+        run: |
+          apt-get update
+          apt-get install -y live-build git ca-certificates xorriso
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: lb config
+      - name: Build ISO
+        run: lb build
+      - name: Checksums
+        run: sha256sum *.iso > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vibeos-iso
+          path: |
+            *.iso
+            SHA256SUMS

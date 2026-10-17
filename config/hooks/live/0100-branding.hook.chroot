@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+# Minimal branding: change the pretty name shown by tools like neofetch/hostnamectl.
+sed -i 's/^PRETTY_NAME=.*/PRETTY_NAME="VibeOS (Debian trixie based)"/' /etc/os-release
+echo "vibeos" > /etc/hostname

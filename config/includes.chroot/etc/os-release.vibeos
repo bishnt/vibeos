@@ -1,0 +1,3 @@
+# Branding placeholder. A hook below can merge this into /etc/os-release.
+PRETTY_NAME="VibeOS (Debian trixie based)"
+NAME="VibeOS"

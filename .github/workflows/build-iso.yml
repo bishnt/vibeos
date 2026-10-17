@@ -11,7 +11,15 @@ jobs:
     container:
       image: debian:trixie
       options: --privileged
+      volumes:
+        - /usr/local/lib/android:/hostfree/android
+        - /usr/share/dotnet:/hostfree/dotnet
+        - /opt/ghc:/hostfree/ghc
     steps:
+      - name: Free disk space
+        run: |
+          rm -rf /hostfree/android/* /hostfree/dotnet/* /hostfree/ghc/* || true
+          df -h /
       - name: Install build deps
         run: |
           apt-get update

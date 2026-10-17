@@ -66,11 +66,18 @@
   .facts div { max-width: 34ch; }
   .facts dt { margin: 0 0 6px; font-size: 1.05rem; font-weight: 600; }
   .facts dd { margin: 0; color: var(--muted); font-size: .98rem; }
+  .stack { margin-top: clamp(24px, 6vh, 64px); }
+  .stack h2 { margin: 0 0 12px; font-size: 1.05rem; font-weight: 600; }
+  .stack dl { margin: 0; border-top: 1px solid rgba(232, 239, 230, .18); }
+  .stack dl > div { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(232, 239, 230, .1); }
+  .stack dt { font-weight: 600; }
+  .stack dd { margin: 0; color: var(--muted); font: 400 .9rem/1.5 var(--mono); }
   footer { margin-top: clamp(32px, 8vh, 80px); color: var(--muted); font: 400 12.5px/1.4 var(--mono); }
   @media (max-width: 820px) {
     .hero { grid-template-columns: 1fr; }
     h1 { max-width: none; }
     .facts { grid-template-columns: 1fr; }
+    .stack dl > div { grid-template-columns: 1fr; gap: 2px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .pulses { display: none; }
@@ -89,7 +96,7 @@
     <section class="hero">
       <div>
         <h1>A Linux desktop in a browser tab.</h1>
-        <p class="lead">VibeOS is a Debian desktop built for engineering students. KiCad, Python and Git are already installed, and it runs on any device with a browser.</p>
+        <p class="lead">VibeOS is a Debian desktop built for engineering students. Circuit simulation, Verilog tools, embedded toolchains and Python are already installed, and it runs on any device with a browser.</p>
         <a class="btn" href="vnc.html?autoconnect=true&amp;resize=scale&amp;reconnect=true">Launch desktop</a>
         <p class="note">The first load can take up to 30 seconds while the machine wakes up.</p>
       </div>
@@ -97,7 +104,7 @@
       <div class="board">
         <svg viewBox="0 0 520 440" role="img" aria-labelledby="bt bd">
           <title id="bt">Circuit board diagram</title>
-          <desc id="bd">Four traces connect KiCad, Python, Git and Firefox to a central chip labelled VibeOS.</desc>
+          <desc id="bd">Four traces connect KiCad, ngspice, Python and Verilog to a central chip labelled VibeOS.</desc>
           <g fill="none" stroke="#1F7A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
             <path id="t1" d="M50 90H110L150 130V180H200"/>
             <path id="t2" d="M50 350H110L150 310V260H200"/>
@@ -129,12 +136,23 @@
           <g fill="#06241B"><circle cx="50" cy="90" r="4"/><circle cx="50" cy="350" r="4"/><circle cx="470" cy="90" r="4"/><circle cx="470" cy="350" r="4"/></g>
           <g font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="13" fill="#E8EFE6">
             <text x="36" y="62">J1 KiCad</text>
-            <text x="36" y="386">J2 Python</text>
-            <text x="484" y="62" text-anchor="end">J3 Git</text>
-            <text x="484" y="386" text-anchor="end">J4 Firefox</text>
+            <text x="36" y="386">J2 ngspice</text>
+            <text x="484" y="62" text-anchor="end">J3 Python</text>
+            <text x="484" y="386" text-anchor="end">J4 Verilog</text>
           </g>
         </svg>
       </div>
+    </section>
+
+    <section class="stack" aria-labelledby="stack-h">
+      <h2 id="stack-h">What&rsquo;s installed</h2>
+      <dl>
+        <div><dt>Circuits</dt><dd>KiCad, ngspice, gnuplot, Qalculate</dd></div>
+        <div><dt>Digital design</dt><dd>Icarus Verilog, GTKWave</dd></div>
+        <div><dt>Embedded</dt><dd>avr-gcc, arm-none-eabi-gcc, OpenOCD, avrdude, picocom</dd></div>
+        <div><dt>Python</dt><dd>NumPy, SciPy, Matplotlib, SymPy, pandas, python-control, pyserial</dd></div>
+        <div><dt>Everyday</dt><dd>Firefox, Git and GitHub CLI, Geany, Mousepad, Node.js</dd></div>
+      </dl>
     </section>
 
     <dl class="facts">

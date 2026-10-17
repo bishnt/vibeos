@@ -1,0 +1,42 @@
+# Installed only on the downloadable ISO (too heavy for the browser desktop).
+# Installer
+calamares
+calamares-settings-debian
+# Hardware support
+xorg
+firmware-linux-free
+firmware-misc-nonfree
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+network-manager
+network-manager-gnome
+lightdm
+pipewire
+pipewire-pulse
+wireplumber
+pavucontrol
+xfce4-pulseaudio-plugin
+xfce4-power-manager
+gvfs-backends
+udisks2
+thunar-volman
+cups
+system-config-printer
+# Heavier engineering tools
+octave
+octave-control
+octave-signal
+verilator
+yosys
+pulseview
+sigrok-cli
+cutecom
+stlink-tools
+texlive-latex-base
+texlive-latex-recommended
+texlive-pictures
+texlive-science
+latexmk
+inkscape
+openscad

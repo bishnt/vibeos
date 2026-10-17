@@ -1,0 +1,13 @@
+#!/bin/bash
+show() {
+  label=$1; shift; out=""
+  for t in "$@"; do command -v "$t" >/dev/null 2>&1 && out="$out $t"; done
+  [ -n "$out" ] && printf '  %-12s%s\n' "$label" "$out"
+}
+echo "VibeOS toolbox"
+show Circuits kicad ngspice gnuplot qalculate-gtk
+show Digital iverilog verilator yosys gtkwave
+show Embedded avr-gcc arm-none-eabi-gcc openocd avrdude picocom
+show Math python3 octave
+show Docs latexmk inkscape openscad
+echo "Starter projects: ~/Engineering"

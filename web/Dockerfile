@@ -14,11 +14,15 @@ RUN apt-get update \
       | xargs apt-get install -y \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+COPY config/includes.chroot/ /
+
 RUN useradd -m -s /bin/bash vibe \
  && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
  && rm -f /usr/share/novnc/index.html
 
 COPY web/landing.html /usr/share/novnc/index.html
+COPY web/vibeos.css /usr/share/novnc/vibeos.css
+RUN sed -i 's#<title>.*</title>#<title>VibeOS</title>#; s#</head>#<link rel="stylesheet" href="vibeos.css"></head>#' /usr/share/novnc/vnc.html
 COPY web/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 EXPOSE 6080

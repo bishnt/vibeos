@@ -1,0 +1,7 @@
+[Configuration]
+FontName=JetBrains Mono 11
+MiscDefaultGeometry=110x30
+ColorForeground=#E8EFE6
+ColorBackground=#06241B
+ColorCursor=#D4A93C
+ScrollingBar=TERMINAL_SCROLLBAR_NONE

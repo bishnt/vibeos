@@ -19,3 +19,8 @@ kicad
 vim
 curl
 htop
+# Appearance
+arc-theme
+papirus-icon-theme
+fonts-inter
+fonts-jetbrains-mono

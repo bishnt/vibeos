@@ -5,6 +5,7 @@ log() { echo "[vibeos] $*"; }
 export HOME=/home/vibe USER=vibe DISPLAY=:1 XDG_RUNTIME_DIR=/tmp/runtime-vibe
 mkdir -p "$XDG_RUNTIME_DIR" "$HOME/.vnc"
 chmod 700 "$XDG_RUNTIME_DIR"
+rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
 
 VNCPASSWD=$(command -v vncpasswd || command -v tigervncpasswd) || { log "ERROR: vncpasswd not found"; exit 1; }
 XVNC=$(command -v Xtigervnc || command -v Xvnc) || { log "ERROR: Xtigervnc not found"; exit 1; }

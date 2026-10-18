@@ -46,3 +46,10 @@ The machine stops when idle and wakes on the first visit, so the first load take
 2. In this GitHub repo, add secrets `HF_TOKEN` (that token) and `VNC_PASSWORD` (8 characters).
 3. Run the **deploy-hf** workflow. It tests the image, creates the Space `vibeos` and pushes to it.
 4. Open `https://<your-hf-username>-vibeos.hf.space`.
+
+## Run it in GitHub Codespaces (free, no card)
+1. Optional but recommended: at github.com/settings/codespaces add a secret `VNC_PASSWORD` (8 characters) and give it access to this repo.
+2. On the repo page click **Code**, then **Codespaces**, then **Create codespace on master**. The first build takes about 10 minutes.
+3. When it is ready the desktop opens in a new tab (or open port 6080 from the **Ports** tab). Click **Launch desktop**.
+4. No secret set? Run `cat /tmp/vibeos.log` in the Codespaces terminal to see the temporary password.
+5. Stop the codespace when you are done, because free hours are limited (see github.com/codespaces).

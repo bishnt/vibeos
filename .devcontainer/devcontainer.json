@@ -1,0 +1,16 @@
+{
+  "name": "VibeOS desktop",
+  "build": {
+    "dockerfile": "../hf/Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vibe",
+  "postStartCommand": "nohup /entrypoint.sh > /tmp/vibeos.log 2>&1 &",
+  "forwardPorts": [6080],
+  "portsAttributes": {
+    "6080": {
+      "label": "VibeOS desktop",
+      "onAutoForward": "openBrowser"
+    }
+  }
+}

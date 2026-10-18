@@ -1,0 +1,32 @@
+# Lean set for the 5-minute Fly demo. The full set lives in config/package-lists/.
+# Desktop
+xfce4
+xfce4-terminal
+xfce4-whiskermenu-plugin
+mousepad
+geany
+arc-theme
+fonts-inter
+fonts-jetbrains-mono
+fonts-dejavu-core
+# Engineering
+ngspice
+gtkwave
+iverilog
+gnuplot-x11
+qalculate-gtk
+python3
+python3-numpy
+python3-scipy
+python3-matplotlib
+python3-sympy
+python3-serial
+python3-tk
+gcc-avr
+avr-libc
+# Basics
+gcc
+make
+git
+nano
+less

@@ -52,6 +52,8 @@
   .btn:hover { background: var(--gold-hi); }
   .btn:focus-visible { outline: 3px solid var(--silk); outline-offset: 3px; }
   .note { margin: 14px 0 0; max-width: 44ch; color: var(--muted); font-size: .95rem; }
+  .link { margin-left: 20px; color: var(--silk); text-underline-offset: 4px; }
+  .timer { color: var(--gold-hi); }
   .board svg { display: block; width: 100%; height: auto; }
   .chip { animation: power 1.1s ease 2.6s both; }
   @keyframes power {
@@ -97,14 +99,16 @@
       <div>
         <h1>A Linux desktop in a browser tab.</h1>
         <p class="lead">VibeOS is a Debian desktop built for engineering students. Circuit simulation, Verilog tools, embedded toolchains and Python are already installed, and it runs on any device with a browser.</p>
-        <a class="btn" href="vnc.html?autoconnect=true&amp;resize=scale&amp;reconnect=true">Launch desktop</a>
+        <a class="btn" href="vnc.html?autoconnect=true&amp;resize=scale&amp;reconnect=true" target="_blank" rel="noopener">Launch desktop</a>
+        <a class="link" href="tools.html">Open the calculators</a>
         <p class="note">The first load can take up to a minute while the machine wakes up.</p>
+        <p class="note timer" id="timer" hidden></p>
       </div>
 
       <div class="board">
         <svg viewBox="0 0 520 440" role="img" aria-labelledby="bt bd">
           <title id="bt">Circuit board diagram</title>
-          <desc id="bd">Four traces connect KiCad, ngspice, Python and Verilog to a central chip labelled VibeOS.</desc>
+          <desc id="bd">Four traces connect ngspice, Verilog, Python and AVR to a central chip labelled VibeOS.</desc>
           <g fill="none" stroke="#1F7A5A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
             <path id="t1" d="M50 90H110L150 130V180H200"/>
             <path id="t2" d="M50 350H110L150 310V260H200"/>
@@ -135,25 +139,16 @@
           <g fill="#D4A93C"><circle cx="50" cy="90" r="10"/><circle cx="50" cy="350" r="10"/><circle cx="470" cy="90" r="10"/><circle cx="470" cy="350" r="10"/></g>
           <g fill="#06241B"><circle cx="50" cy="90" r="4"/><circle cx="50" cy="350" r="4"/><circle cx="470" cy="90" r="4"/><circle cx="470" cy="350" r="4"/></g>
           <g font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="13" fill="#E8EFE6">
-            <text x="36" y="62">J1 KiCad</text>
-            <text x="36" y="386">J2 ngspice</text>
+            <text x="36" y="62">J1 ngspice</text>
+            <text x="36" y="386">J2 Verilog</text>
             <text x="484" y="62" text-anchor="end">J3 Python</text>
-            <text x="484" y="386" text-anchor="end">J4 Verilog</text>
+            <text x="484" y="386" text-anchor="end">J4 AVR</text>
           </g>
         </svg>
       </div>
     </section>
 
-    <section class="stack" aria-labelledby="stack-h">
-      <h2 id="stack-h">What&rsquo;s installed</h2>
-      <dl>
-        <div><dt>Circuits</dt><dd>KiCad, ngspice, gnuplot, Qalculate</dd></div>
-        <div><dt>Digital design</dt><dd>Icarus Verilog, GTKWave</dd></div>
-        <div><dt>Embedded</dt><dd>avr-gcc, arm-none-eabi-gcc, OpenOCD, avrdude, picocom</dd></div>
-        <div><dt>Python</dt><dd>NumPy, SciPy, Matplotlib, SymPy, pandas, pyserial</dd></div>
-        <div><dt>Everyday</dt><dd>Firefox, Git and GitHub CLI, Geany, Mousepad, Node.js</dd></div>
-      </dl>
-    </section>
+    <!--STACK-->
 
     <dl class="facts">
       <div><dt>It asks for a password</dt><dd>You enter it once the desktop connects. Ask whoever shared this link if you don&rsquo;t have it.</dd></div>
@@ -164,5 +159,29 @@
 
   <footer>Built on Debian trixie with XFCE.</footer>
 </div>
+<script>
+(function () {
+  var el = document.getElementById('timer');
+  if (!el) return;
+  fetch('started.txt', { cache: 'no-store' }).then(function (r) {
+    if (!r.ok) throw new Error('none');
+    var d = r.headers.get('Date');
+    return r.text().then(function (t) {
+      return { start: parseInt(t, 10), server: d ? Date.parse(d) / 1000 : Date.now() / 1000 };
+    });
+  }).then(function (o) {
+    if (!o.start) return;
+    var skew = o.server - Date.now() / 1000;
+    el.hidden = false;
+    function tick() {
+      var left = 300 - ((Date.now() / 1000 + skew) - o.start);
+      if (left <= 0) { el.textContent = 'This free session has ended. Reload in a minute to start a new one.'; return; }
+      var m = Math.floor(left / 60), s = Math.floor(left % 60);
+      el.textContent = 'Free session ends in about ' + m + ':' + ('0' + s).slice(-2) + '.';
+    }
+    tick(); setInterval(tick, 1000);
+  }).catch(function () {});
+})();
+</script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 name: build-web
 on:
   push:
-    paths: ['web/**', 'config/**', '.github/workflows/build-web.yml']
+    paths: ['web/**', 'config/includes.chroot/**', 'fly.toml', '.github/workflows/build-web.yml']
   workflow_dispatch:
 
 permissions:
@@ -29,10 +29,24 @@ jobs:
           size=$(docker image inspect "$IMAGE" --format '{{.Size}}')
           echo "::notice title=Image size::$((size/1000000)) MB uncompressed"
           [ "$size" -lt 7000000000 ] || { echo "::error title=Image too large for Fly (8 GiB limit)::$((size/1000000)) MB"; exit 1; }
-      - name: Report build errors
+      - name: Smoke test
+        run: |
+          docker run -d --name vibeos-lite -e VNC_PASSWORD=testpass1 -p 6080:6080 "$IMAGE"
+          sleep 25
+          curl -sf localhost:6080/ | grep -q "Launch desktop"
+          curl -sf localhost:6080/ | grep -q "Icarus Verilog"
+          curl -sf localhost:6080/tools.html | grep -q "Ohm"
+          curl -sf localhost:6080/started.txt | grep -Eq '^[0-9]+$'
+          docker exec vibeos-lite pgrep -x Xtigervnc
+          docker exec vibeos-lite pgrep -x xfce4-panel
+          docker exec vibeos-lite pgrep -x xfdesktop
+          docker exec vibeos-lite sh -c 'for t in ngspice iverilog gtkwave avr-gcc gnuplot geany; do command -v $t || exit 1; done'
+          docker exec vibeos-lite python3 -c "import numpy, scipy, matplotlib, sympy, serial"
+          echo "::notice title=Smoke test::landing page, calculators, desktop and tools all work"
+      - name: Report failure details
         if: failure()
         run: |
-          echo "::error title=Matching lines::$(grep -E 'E: |Unable to locate|no installation candidate|ERROR|not found|No space' build.log | tail -15 | tr '\n' ' ' | cut -c1-3000)"
-          echo "::error title=Log tail::$(tail -25 build.log | tr '\n' ' ' | cut -c1-3000)"
+          echo "::error title=Matching lines::$(grep -E 'E: |Unable to locate|no installation candidate|ERROR|not found|No space' build.log | tail -15 | tr '\n' ' ' | cut -c1-2500)"
+          echo "::error title=Container log::$(docker logs vibeos-lite 2>&1 | tail -30 | tr '\n' ' ' | cut -c1-2500)"
       - name: Push image
         run: docker push "$IMAGE"

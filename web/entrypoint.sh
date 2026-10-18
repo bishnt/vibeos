@@ -1,23 +1,25 @@
 #!/bin/bash
-# The web server stays up even if the desktop fails, and startup output is
-# written to /status.txt so problems can be read from a browser.
-STATUS=/usr/share/novnc/status.txt
-: > "$STATUS"; chmod 644 "$STATUS"
+# Fly runs this as root. The web server stays up even if the desktop fails.
+STATUS=/tmp/vibeos-status.log
+: > "$STATUS"
 tail -F "$STATUS" &
 log() { echo "[vibeos] $*" >> "$STATUS"; }
+
+# the landing page reads this to show a session countdown
+date +%s > /usr/share/novnc/started.txt
+chmod 644 /usr/share/novnc/started.txt
 
 websockify --web=/usr/share/novnc 6080 127.0.0.1:5901 >> "$STATUS" 2>&1 &
 WS=$!
 log "web server started on :6080 (pid $WS)"
-log "memory: $(free -m | awk '/Mem/{print $2}') MB"
 
 start_desktop() {
   set -e
   VNCPASSWD=$(command -v vncpasswd || command -v tigervncpasswd) || { log "ERROR: vncpasswd not found"; exit 1; }
   XVNC=$(command -v Xtigervnc || command -v Xvnc) || { log "ERROR: Xtigervnc not found"; exit 1; }
-  log "vncpasswd=$VNCPASSWD xvnc=$XVNC"
 
   mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix
+  rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
   install -d -o vibe -g vibe -m 700 /tmp/runtime-vibe
 
   if [ -z "$VNC_PASSWORD" ]; then
@@ -30,7 +32,6 @@ start_desktop() {
   echo "${VNC_PASSWORD:0:8}" | "$VNCPASSWD" -f > /home/vibe/.vnc/passwd
   chmod 600 /home/vibe/.vnc/passwd
   chown -R vibe:vibe /home/vibe/.vnc
-  log "password file written"
 
   log "starting X server and XFCE"
   runuser -u vibe -- env HOME=/home/vibe USER=vibe DISPLAY=:1 \
@@ -38,11 +39,11 @@ start_desktop() {
       "$XVNC" :1 -geometry 1440x900 -depth 24 -rfbport 5901 \
         -rfbauth /home/vibe/.vnc/passwd -SecurityTypes VncAuth -localhost yes &
       for i in $(seq 1 40); do [ -e /tmp/.X11-unix/X1 ] && break; sleep 0.5; done
-      echo "[vibeos] X server socket ready: $(ls /tmp/.X11-unix)"
+      echo "[vibeos] X server socket ready"
       exec dbus-launch --exit-with-session startxfce4
     '
 }
 
 ( start_desktop ) >> "$STATUS" 2>&1
-log "desktop exited with code $?. Keeping the web server up so this log stays readable."
+log "desktop exited with code $?. Keeping the web server up."
 wait $WS

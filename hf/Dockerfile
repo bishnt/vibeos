@@ -22,7 +22,10 @@ RUN useradd -m -u 1000 -s /bin/bash vibe \
  && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \
  && rm -f /usr/share/novnc/index.html
 
-COPY web/landing.html /usr/share/novnc/index.html
+COPY web/landing.html /tmp/landing.html
+COPY web/stack-full.html /tmp/stack.html
+COPY web/tools.html /usr/share/novnc/tools.html
+RUN sed -e '/<!--STACK-->/{r /tmp/stack.html' -e 'd}' /tmp/landing.html > /usr/share/novnc/index.html
 COPY web/vibeos.css /usr/share/novnc/vibeos.css
 RUN sed -i 's#<title>.*</title>#<title>VibeOS</title>#; s#</head>#<link rel="stylesheet" href="vibeos.css"></head>#' /usr/share/novnc/vnc.html
 

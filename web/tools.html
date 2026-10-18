@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VibeOS calculators</title>
+<meta name="theme-color" content="#0B3D2E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230B3D2E'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23D4A93C'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%2306241B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --board:#0B3D2E; --chip:#06241B; --silk:#E8EFE6; --muted:#9DB8AA; --gold:#D4A93C; --gold-hi:#F2CF6B;
+    --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace; }
+  * { box-sizing: border-box; }
+  html { background: var(--board); color-scheme: dark; }
+  body { margin:0; min-height:100vh; color:var(--silk); font-family:var(--display); line-height:1.5;
+    background-color:var(--board); background-image:radial-gradient(rgba(232,239,230,.07) 1px,transparent 1.3px); background-size:28px 28px; }
+  .wrap { max-width:1120px; margin:0 auto; padding:clamp(20px,4vw,48px); }
+  a { color:var(--silk); text-underline-offset:4px; }
+  h1 { margin:18px 0 6px; font-size:clamp(2rem,4.4vw,3rem); letter-spacing:-.02em; line-height:1.05; }
+  p.sub { margin:0 0 28px; color:var(--muted); max-width:56ch; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+  .card { border:1px solid rgba(232,239,230,.18); border-radius:10px; padding:20px; background:rgba(6,36,27,.55); }
+  .card h2 { margin:0 0 4px; font-size:1.1rem; }
+  .card p { margin:0 0 8px; color:var(--muted); font-size:.9rem; }
+  label { display:block; margin:10px 0 4px; font-size:.85rem; color:var(--muted); }
+  input, select { width:100%; padding:10px 12px; border-radius:6px; border:1px solid rgba(232,239,230,.25);
+    background:var(--chip); color:var(--silk); font:400 .95rem var(--mono); }
+  input:focus-visible, select:focus-visible, a:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .out { margin-top:14px; min-height:1.6em; font:600 .95rem/1.6 var(--mono); color:var(--gold-hi); white-space:pre-line; }
+  .swatches { display:flex; gap:6px; margin-top:12px; }
+  .swatches span { width:26px; height:26px; border-radius:5px; border:1px solid rgba(232,239,230,.35); }
+  footer { margin-top:36px; color:var(--muted); font:400 12.5px/1.4 var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="./">Back to VibeOS</a>
+  <h1>Engineering calculators</h1>
+  <p class="sub">Type values with prefixes like 4.7k, 100n or 2.2u. Results update as you type.</p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Ohm&rsquo;s law</h2>
+      <p>Fill in any two values.</p>
+      <div class="row"><div><label for="ov">Voltage (V)</label><input id="ov" inputmode="decimal" autocomplete="off"></div>
+      <div><label for="oi">Current (A)</label><input id="oi" inputmode="decimal" autocomplete="off"></div></div>
+      <div class="row"><div><label for="or">Resistance (&Omega;)</label><input id="or" inputmode="decimal" autocomplete="off"></div>
+      <div><label for="op">Power (W)</label><input id="op" inputmode="decimal" autocomplete="off"></div></div>
+      <div class="out" id="oo"></div>
+    </section>
+
+    <section class="card">
+      <h2>Voltage divider</h2>
+      <p>Vout = Vin &times; R2 / (R1 + R2)</p>
+      <label for="dv">Vin (V)</label><input id="dv" value="5" autocomplete="off">
+      <div class="row"><div><label for="d1">R1 (&Omega;)</label><input id="d1" value="10k" autocomplete="off"></div>
+      <div><label for="d2">R2 (&Omega;)</label><input id="d2" value="10k" autocomplete="off"></div></div>
+      <div class="out" id="do"></div>
+    </section>
+
+    <section class="card">
+      <h2>RC filter</h2>
+      <p>Cutoff frequency and time constant.</p>
+      <div class="row"><div><label for="rr">R (&Omega;)</label><input id="rr" value="1k" autocomplete="off"></div>
+      <div><label for="rc">C (F)</label><input id="rc" value="100n" autocomplete="off"></div></div>
+      <div class="out" id="ro"></div>
+    </section>
+
+    <section class="card">
+      <h2>LED resistor</h2>
+      <p>Series resistor for an LED.</p>
+      <div class="row"><div><label for="ls">Supply (V)</label><input id="ls" value="5" autocomplete="off"></div>
+      <div><label for="lf">LED drop (V)</label><input id="lf" value="2" autocomplete="off"></div></div>
+      <label for="li">Current (A)</label><input id="li" value="15m" autocomplete="off">
+      <div class="out" id="lo"></div>
+    </section>
+
+    <section class="card">
+      <h2>Series and parallel</h2>
+      <p>List resistor values separated by commas or spaces.</p>
+      <label for="sp">Values (&Omega;)</label><input id="sp" value="1k, 2.2k, 4.7k" autocomplete="off">
+      <div class="out" id="spo"></div>
+    </section>
+
+    <section class="card">
+      <h2>Resistor colour code</h2>
+      <p>Four-band resistors.</p>
+      <div class="row"><div><label for="c1">Band 1</label><select id="c1"></select></div>
+      <div><label for="c2">Band 2</label><select id="c2"></select></div></div>
+      <div class="row"><div><label for="c3">Multiplier</label><select id="c3"></select></div>
+      <div><label for="c4">Tolerance</label><select id="c4"></select></div></div>
+      <div class="swatches" id="sw"></div>
+      <div class="out" id="co"></div>
+    </section>
+  </div>
+  <footer>Runs in your browser. Nothing is sent anywhere.</footer>
+</div>
+
+<script>
+// --- pure ---
+function parse(s) {
+  s = String(s == null ? '' : s).trim().replace('\u00b5', 'u');
+  if (!s) return NaN;
+  var m = s.match(/^([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)\s*([pnumkMG]?)$/);
+  if (!m) return NaN;
+  var mult = { p: 1e-12, n: 1e-9, u: 1e-6, m: 1e-3, '': 1, k: 1e3, M: 1e6, G: 1e9 };
+  return parseFloat(m[1]) * mult[m[2]];
+}
+function fmt(x, u) {
+  if (!isFinite(x)) return '-';
+  if (x === 0) return '0 ' + u;
+  var p = [[1e9, 'G'], [1e6, 'M'], [1e3, 'k'], [1, ''], [1e-3, 'm'], [1e-6, '\u00b5'], [1e-9, 'n'], [1e-12, 'p']];
+  var a = Math.abs(x);
+  for (var i = 0; i < p.length; i++) {
+    if (a >= p[i][0] * 0.9999999) return (+(x / p[i][0]).toPrecision(4)) + ' ' + p[i][1] + u;
+  }
+  return x.toExponential(2) + ' ' + u;
+}
+function ohm(v, i, r, p) {
+  var f = [v, i, r, p].map(Number.isFinite);
+  if (f.filter(Boolean).length !== 2) return 'Fill in any two of the four.';
+  if (f[0] && f[1]) { r = v / i; p = v * i; }
+  else if (f[0] && f[2]) { i = v / r; p = v * v / r; }
+  else if (f[1] && f[2]) { v = i * r; p = i * i * r; }
+  else if (f[0] && f[3]) { i = p / v; r = v * v / p; }
+  else if (f[1] && f[3]) { v = p / i; r = p / (i * i); }
+  else { v = Math.sqrt(p * r); i = Math.sqrt(p / r); }
+  return 'V = ' + fmt(v, 'V') + '\nI = ' + fmt(i, 'A') + '\nR = ' + fmt(r, '\u03a9') + '\nP = ' + fmt(p, 'W');
+}
+function divider(vin, r1, r2) {
+  if (![vin, r1, r2].every(Number.isFinite)) return 'Enter all three values.';
+  return 'Vout = ' + fmt(vin * r2 / (r1 + r2), 'V') + '\nCurrent = ' + fmt(vin / (r1 + r2), 'A');
+}
+function rc(r, c) {
+  if (![r, c].every(Number.isFinite)) return 'Enter R and C.';
+  return 'Cutoff = ' + fmt(1 / (2 * Math.PI * r * c), 'Hz') + '\nTau = ' + fmt(r * c, 's');
+}
+function e12up(r) {
+  var s = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2, 10];
+  var d = Math.pow(10, Math.floor(Math.log10(r))), n = r / d;
+  for (var i = 0; i < s.length; i++) if (s[i] >= n * 0.9999) return s[i] * d;
+  return 10 * d;
+}
+function led(vs, vf, i) {
+  if (![vs, vf, i].every(Number.isFinite)) return 'Enter all three values.';
+  if (vs <= vf || i <= 0) return 'Supply must be above the LED drop.';
+  var r = (vs - vf) / i;
+  return 'R = ' + fmt(r, '\u03a9') + '\nNext E12 value up = ' + fmt(e12up(r), '\u03a9') + '\nResistor power = ' + fmt((vs - vf) * i, 'W');
+}
+function seriesParallel(text) {
+  var v = String(text).split(/[\s,]+/).filter(Boolean).map(parse);
+  if (!v.length || !v.every(function (x) { return isFinite(x) && x > 0; })) return 'Enter positive values.';
+  var ser = v.reduce(function (a, b) { return a + b; }, 0);
+  var par = 1 / v.reduce(function (a, b) { return a + 1 / b; }, 0);
+  return 'Series = ' + fmt(ser, '\u03a9') + '\nParallel = ' + fmt(par, '\u03a9');
+}
+var BANDS = [
+  ['Black', '#111111'], ['Brown', '#7b4a2b'], ['Red', '#d33a3a'], ['Orange', '#f08a1c'], ['Yellow', '#e8d93a'],
+  ['Green', '#3aa03a'], ['Blue', '#3a62f0'], ['Violet', '#9a3ac8'], ['Grey', '#999999'], ['White', '#eeeeee']
+];
+var MULTS = BANDS.map(function (b, i) { return [b[0], b[1], Math.pow(10, i)]; })
+  .concat([['Gold', '#d4a93c', 0.1], ['Silver', '#cccccc', 0.01]]);
+var TOLS = [['Brown', '#7b4a2b', 1], ['Red', '#d33a3a', 2], ['Green', '#3aa03a', 0.5], ['Blue', '#3a62f0', 0.25],
+  ['Violet', '#9a3ac8', 0.1], ['Gold', '#d4a93c', 5], ['Silver', '#cccccc', 10]];
+function colourCode(a, b, m, t) {
+  return (a * 10 + b) * MULTS[m][2];
+}
+// --- end pure ---
+
+function $(id) { return document.getElementById(id); }
+function wire(ids, fn, out) {
+  function run() {
+    try { $(out).textContent = fn.apply(null, ids.map(function (i) { return parse($(i).value); })); }
+    catch (e) { $(out).textContent = ''; }
+  }
+  ids.forEach(function (i) { $(i).addEventListener('input', run); });
+  run();
+}
+wire(['ov', 'oi', 'or', 'op'], ohm, 'oo');
+wire(['dv', 'd1', 'd2'], divider, 'do');
+wire(['rr', 'rc'], rc, 'ro');
+wire(['ls', 'lf', 'li'], led, 'lo');
+$('sp').addEventListener('input', function () { $('spo').textContent = seriesParallel($('sp').value); });
+$('spo').textContent = seriesParallel($('sp').value);
+
+function fill(id, list, start) {
+  list.forEach(function (b, i) {
+    var o = document.createElement('option'); o.value = i; o.textContent = b[0]; $(id).appendChild(o);
+  });
+  $(id).value = start;
+}
+fill('c1', BANDS, 4); fill('c2', BANDS, 7); fill('c3', MULTS, 2); fill('c4', TOLS, 5);
+function showCode() {
+  var a = +$('c1').value, b = +$('c2').value, m = +$('c3').value, t = +$('c4').value;
+  var v = colourCode(a, b, m, t);
+  $('co').textContent = fmt(v, '\u03a9') + ' \u00b1' + TOLS[t][2] + '%';
+  $('sw').innerHTML = '';
+  [BANDS[a], BANDS[b], MULTS[m], TOLS[t]].forEach(function (c) {
+    var s = document.createElement('span'); s.style.background = c[1]; s.title = c[0]; $('sw').appendChild(s);
+  });
+}
+['c1', 'c2', 'c3', 'c4'].forEach(function (i) { $(i).addEventListener('change', showCode); });
+showCode();
+</script>
+</body>
+</html>

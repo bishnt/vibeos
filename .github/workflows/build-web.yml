@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
           [ "$size" -lt 7000000000 ] || { echo "::error title=Image too large for Fly (8 GiB limit)::$((size/1000000)) MB"; exit 1; }
       - name: Smoke test
         run: |
-          docker run -d --name vibeos-lite -e VNC_PASSWORD=testpass1 -p 6080:6080 "$IMAGE"
+          docker run -d --shm-size=512m --name vibeos-lite -e VNC_PASSWORD=testpass1 -p 6080:6080 "$IMAGE"
           sleep 25
           curl -sf localhost:6080/ | grep -q "Launch desktop"
           curl -sf localhost:6080/ | grep -q "Icarus Verilog"
@@ -43,6 +43,18 @@ jobs:
           docker exec vibeos-lite sh -c 'for t in ngspice iverilog gtkwave avr-gcc gnuplot geany; do command -v $t || exit 1; done'
           docker exec vibeos-lite python3 -c "import numpy, scipy, matplotlib, sympy, serial"
           echo "::notice title=Smoke test::landing page, calculators, desktop and tools all work"
+      - name: Screenshot of the desktop
+        continue-on-error: true
+        run: |
+          docker exec -d -u vibe -e DISPLAY=:1 -e HOME=/home/vibe vibeos-lite sh -c 'xfce4-terminal --geometry=100x26 & firefox-esr http://localhost:6080/tools.html & wait'
+          docker exec vibeos-lite sh -c 'apt-get update -qq >/dev/null && apt-get install -y -qq --no-install-recommends scrot >/dev/null'
+          sleep 25
+          docker exec vibeos-lite pgrep -a firefox | head -2 || true
+          docker exec -u vibe -e DISPLAY=:1 vibeos-lite scrot -o /tmp/desktop.png
+          mkdir -p /tmp/shots && docker cp vibeos-lite:/tmp/desktop.png /tmp/shots/desktop.png
+          cd /tmp/shots && git init -q -b screenshots && git add . \
+            && git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "desktop screenshot" \
+            && git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" screenshots
       - name: Report failure details
         if: failure()
         run: |

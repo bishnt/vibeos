@@ -13,6 +13,7 @@ RUN apt-get update \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY config/includes.chroot/ /
+RUN mkdir -p /usr/lib/firefox-esr/distribution && cp /etc/firefox/policies/policies.json /usr/lib/firefox-esr/distribution/policies.json
 # the lean image has no Papirus icons
 RUN sed -i 's/Papirus-Dark/Adwaita/' /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
 

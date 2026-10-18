@@ -17,6 +17,7 @@ RUN apt-get update \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY config/includes.chroot/ /
+RUN mkdir -p /usr/lib/firefox-esr/distribution && cp /etc/firefox/policies/policies.json /usr/lib/firefox-esr/distribution/policies.json
 
 RUN useradd -m -u 1000 -s /bin/bash vibe \
  && mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix \

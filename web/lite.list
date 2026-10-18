@@ -5,6 +5,9 @@ xfce4-terminal
 xfce4-whiskermenu-plugin
 mousepad
 geany
+firefox-esr
+fonts-liberation
+xdg-utils
 arc-theme
 fonts-inter
 fonts-jetbrains-mono

@@ -1,0 +1,43 @@
+name: test-desktop
+on:
+  push:
+    branches: [main, master]
+    paths: ['web/**', 'hf/**', 'config/**', '.github/workflows/test-desktop.yml']
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: hf/Dockerfile
+          load: true
+          tags: vibeos-hf
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test
+        run: |
+          if ! out=$(docker run -d --name vibeos-test -e VNC_PASSWORD=testpass1 -p 6080:6080 vibeos-hf 2>&1); then
+            echo "::error title=docker run failed::$(echo "$out" | tr '\n' ' ' | cut -c1-2000)"
+            docker images | head -5
+            exit 1
+          fi
+          sleep 30
+          docker logs vibeos-test 2>&1 | tail -20
+          curl -sf localhost:6080/ | grep -q "Launch desktop"
+          curl -sf localhost:6080/vnc.html | grep -q "<title>VibeOS</title>"
+          docker exec vibeos-test pgrep -x Xtigervnc
+          docker exec vibeos-test pgrep -x xfce4-panel
+          docker exec vibeos-test pgrep -x xfdesktop
+          echo "::notice title=Smoke test::landing page, noVNC, X server, panel and desktop are all running"
+      - name: Report failure details
+        if: failure()
+        run: |
+          echo "::error title=Container log::$(docker logs vibeos-test 2>&1 | tail -30 | tr '\n' ' ' | cut -c1-2500)"
+          echo "::error title=Processes::$(docker exec vibeos-test ps -eo comm 2>&1 | tr '\n' ' ' | cut -c1-1500)"
+

@@ -41,12 +41,6 @@ The machine stops when idle and wakes on the first visit, so the first load take
 - Redeploy after changes: `git pull && fly deploy --remote-only`
 - Logs: `fly logs -a bishnt-vibeos` (lines starting with `[vibeos]` show startup progress)
 
-## Host it on Hugging Face Spaces (free, no card)
-1. Create a free account at huggingface.co and make a **write** token under Settings, Access Tokens.
-2. In this GitHub repo, add secrets `HF_TOKEN` (that token) and `VNC_PASSWORD` (8 characters).
-3. Run the **deploy-hf** workflow. It tests the image, creates the Space `vibeos` and pushes to it.
-4. Open `https://<your-hf-username>-vibeos.hf.space`.
-
 ## Run it in GitHub Codespaces (free, no card)
 1. Optional but recommended: at github.com/settings/codespaces add a secret `VNC_PASSWORD` (8 characters) and give it access to this repo.
 2. On the repo page click **Code**, then **Codespaces**, then **Create codespace on master**. The first build takes about 10 minutes.
